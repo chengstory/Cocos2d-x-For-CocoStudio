@@ -1,30 +1,62 @@
 #include "CocosGUIScene.h"
 #include "CocosGUIExamplesScene.h"
+#include "ExtensionsTest.h"
 
-
-CocosGUITestScene::CocosGUITestScene(bool bPortrait)
+void runCocosGUITestLayer()
 {
-	TestScene::init();
-    
-//	CCSprite *bg = CCSprite::create("armature/bg.jpg");
-//	bg->setPosition(VisibleRect::center());
-//    
-//	float scaleX = VisibleRect::getVisibleRect().size.width / bg->getContentSize().width;
-//	float scaleY = VisibleRect::getVisibleRect().size.height / bg->getContentSize().height;
-//    
-//	bg->setScaleX(scaleX);
-//	bg->setScaleY(scaleY);
-//    
-//	addChild(bg);
+    CCScene *pScene = CocosGUITestLayer::scene();
+    CCDirector::sharedDirector()->replaceScene(pScene);
 }
-void CocosGUITestScene::runThisTest()
+
+CocosGUITestLayer::~CocosGUITestLayer()
 {
-    
-	CCDirector::sharedDirector()->replaceScene(this);
+}
+
+CocosGUITestLayer::CocosGUITestLayer()
+{
+
+}
+
+CCScene* CocosGUITestLayer::scene()
+{
+	CCScene * scene = NULL;
+	do 
+	{
+		// 'scene' is an autorelease object
+		scene = CCScene::create();
+		CC_BREAK_IF(! scene);
+
+		// 'layer' is an autorelease object
+		CocosGUITestLayer *layer = CocosGUITestLayer::create();
+		CC_BREAK_IF(! layer);
+
+		// add layer as a child to scene
+		scene->addChild(layer);
+	} while (0);
+
+	// return the scene
+	return scene;
+}
+
+bool CocosGUITestLayer::init()
+{
+    if (!CCLayer::init())
+    {
+        return false;
+    }
     
     ul = UILayer::create();
     ul->scheduleUpdate();
     this->addChild(ul);
+    
+    
+    CCMenuItemFont *itemBack = CCMenuItemFont::create("Back", this, menu_selector(CocosGUITestLayer::toExtensionsMainLayer));
+        itemBack->setColor(ccc3(255, 255, 255));
+        itemBack->setPosition(ccp(VisibleRect::rightBottom().x - 50, VisibleRect::rightBottom().y + 25));
+        CCMenu *menuBack = CCMenu::create(itemBack, NULL);
+        menuBack->setPosition(CCPointZero);
+		menuBack->setZOrder(4);
+    this->addChild(menuBack);
     
 //    UILayer* ul2 = UILayer::create();
 //    this->addChild(ul2);
@@ -61,25 +93,35 @@ void CocosGUITestScene::runThisTest()
     ul->addWidget(CCUIHELPER->createWidgetFromJsonFile("cocosgui/CocoGUISample.json"));
 
     UIButton* exitBtn = dynamic_cast<UIButton*>(ul->getWidgetByName("exitbutton"));
-    exitBtn->addReleaseEvent(this, coco_releaseselector(CocosGUITestScene::toCocosGUIExampleScene));
-}
-void CocosGUITestScene::MainMenuCallback(CCObject* pSender)
-{
-    CCLOG("p1 click");
-    CCLOG("p1 retain count == %d",ul->retainCount());
-    ul->removeFromParent();
-    TestScene::MainMenuCallback(pSender);
+    exitBtn->addReleaseEvent(this, coco_releaseselector(CocosGUITestLayer::toCocosGUIExampleScene));
+    
+    return true;
 }
 
-void CocosGUITestScene::toCocosGUIExampleScene(CCObject* pSender)
+void CocosGUITestLayer::toExtensionsMainLayer(cocos2d::CCObject *sender)
+{
+    ul->removeFromParent();
+
+	ExtensionsTestScene *pScene = new ExtensionsTestScene();
+	pScene->runThisTest();
+	pScene->release();
+}
+
+void CocosGUITestLayer::toCocosGUIExampleScene(CCObject* pSender)
 {
     CCLOG("p2 click");
     ul->removeFromParent();
     
-    CocosGUIExamplesScene* pScene = new CocosGUIExamplesScene();
-    if (pScene)
-    {
-        pScene->runThisTest();
-        pScene->release();
-    }
+    CCScene *pScene = CocosGUIExampleLayer::scene();
+    CCDirector::sharedDirector()->replaceScene(pScene);
+    
+//    CCScene *pScene = SceneEditorTestLayer::scene();
+//    CCDirector::sharedDirector()->replaceScene(pScene);
+    
+//    CocosGUIExamplesScene* pScene = new CocosGUIExamplesScene();
+//    if (pScene)
+//    {
+//        pScene->runThisTest();
+//        pScene->release();
+//    }
 }

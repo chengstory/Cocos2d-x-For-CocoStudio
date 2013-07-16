@@ -175,12 +175,7 @@ void ExtensionsMainLayer::menuCallback(CCObject* pSender)
             break;
         case TEST_COCOSGUI:
         {
-			CocosGUITestScene *pScene = new CocosGUITestScene();
-			if (pScene)
-			{
-				pScene->runThisTest();
-				pScene->release();
-			}
+            runCocosGUITestLayer();			
 		}
             break;
     default:

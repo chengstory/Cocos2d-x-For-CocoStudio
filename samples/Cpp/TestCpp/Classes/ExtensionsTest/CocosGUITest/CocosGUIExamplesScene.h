@@ -33,13 +33,23 @@ enum EQUIP_TYPE {
 using namespace cocos2d;
 using namespace cocos2d::extension;
 
-class CocosGUIExamplesScene : public TestScene
+class CocosGUIExampleLayer : public CCLayer
 {
 public:
-	CocosGUIExamplesScene(bool bPortrait = false);
     
-    virtual void onEnter();
-    virtual void onExit();
+    CocosGUIExampleLayer();
+	~CocosGUIExampleLayer();
+
+	// Here's a difference. Method 'init' in cocos2d-x returns bool, 
+    // instead of returning 'id' in cocos2d-iphone
+	virtual bool init();
+    
+    // there's no 'id' in cpp, so we recommand to return the exactly class pointer
+	static cocos2d::CCScene* scene();
+
+	// implement the "static node()" method manually
+	CREATE_FUNC(CocosGUIExampleLayer);
+
     
 	virtual void runThisTest();
     

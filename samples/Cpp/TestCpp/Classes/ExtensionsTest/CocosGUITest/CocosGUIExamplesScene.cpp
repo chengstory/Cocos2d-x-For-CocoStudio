@@ -2,6 +2,7 @@
 
 #include "CocosGUIExamplesScene.h"
 #include "CocosGUIScene.h"
+#include "ExtensionsTest.h"
 
 
 const char* weapon_introduce_text[31] =
@@ -39,15 +40,42 @@ const char* weapon_introduce_text[31] =
 	"Urdu: 31",
 };
 
-
-CocosGUIExamplesScene::CocosGUIExamplesScene(bool bPortrait)
+CocosGUIExampleLayer::~CocosGUIExampleLayer()
 {
-	TestScene::init();
 }
 
-void CocosGUIExamplesScene::onEnter()
+CocosGUIExampleLayer::CocosGUIExampleLayer()
 {
-    TestScene::onEnter();
+
+}
+
+CCScene* CocosGUIExampleLayer::scene()
+{
+	CCScene * scene = NULL;
+	do 
+	{
+		// 'scene' is an autorelease object
+		scene = CCScene::create();
+		CC_BREAK_IF(! scene);
+
+		// 'layer' is an autorelease object
+		CocosGUIExampleLayer *layer = CocosGUIExampleLayer::create();
+		CC_BREAK_IF(! layer);
+
+		// add layer as a child to scene
+		scene->addChild(layer);
+	} while (0);
+
+	// return the scene
+	return scene;
+}
+
+bool CocosGUIExampleLayer::init()
+{
+    if (!CCLayer::init())
+    {
+        return false;
+    }
     
     ul = UILayer::create();
     ul->scheduleUpdate();
@@ -61,50 +89,35 @@ void CocosGUIExamplesScene::onEnter()
     exit->setTextures("cocosgui/CloseNormal.png", "cocosgui/CloseSelected.png", "");
     exit->setPosition(ccp(430, 60));
     exit->setTouchEnable(true);
-    exit->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::toCocosGUITestScene));
+    exit->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::toCocosGUITestScene));
     ul->addWidget(exit);
+    return true;
 }
 
-void CocosGUIExamplesScene::onExit()
-{
-    TestScene::onExit();
-    
-    /*
-    CC_SAFE_RELEASE(m_dicBeUsedSlot);
-    CC_SAFE_RELEASE(m_dicEquipClothesSlot);
-    CC_SAFE_RELEASE(m_dicEquipWeaponsSlot);
-    CC_SAFE_RELEASE(m_dicEquipPetsSlot);
-    CC_SAFE_RELEASE(m_dicEquipClothes);
-    CC_SAFE_RELEASE(m_dicEquipWeapons);
-    CC_SAFE_RELEASE(m_dicEquipPets);
-     */
-}
-
-void CocosGUIExamplesScene::runThisTest()
+void CocosGUIExampleLayer::runThisTest()
 {    
-	CCDirector::sharedDirector()->replaceScene(this);
+	
 }
 
-void CocosGUIExamplesScene::MainMenuCallback(CCObject* pSender)
-{
-    ul->removeFromParent();
-	TestScene::MainMenuCallback(pSender);
-}
-
-void CocosGUIExamplesScene::toCocosGUITestScene(CCObject *pSender)
+void CocosGUIExampleLayer::MainMenuCallback(CCObject* pSender)
 {
     ul->removeFromParent();
     
-    CocosGUITestScene *pScene = new CocosGUITestScene();
-    if (pScene)
-    {
-        pScene->runThisTest();
-        pScene->release();
-    }
+    ExtensionsTestScene *pScene = new ExtensionsTestScene();
+	pScene->runThisTest();
+	pScene->release();
+}
+
+void CocosGUIExampleLayer::toCocosGUITestScene(CCObject *pSender)
+{
+    ul->removeFromParent();
+    
+    CCScene *pScene = CocosGUITestLayer::scene();
+    CCDirector::sharedDirector()->replaceScene(pScene);
 }
 
 // ui
-void CocosGUIExamplesScene::ExamplesInit()
+void CocosGUIExampleLayer::ExamplesInit()
 {
     // example root
     UIWidget* example_root = CCUIHELPER->createWidgetFromJsonFile("cocosgui/examples/examples_1.json");
@@ -122,7 +135,7 @@ void CocosGUIExamplesScene::ExamplesInit()
 }
 
 // ui button
-void CocosGUIExamplesScene::ExamplesButtonPanelInit()
+void CocosGUIExampleLayer::ExamplesButtonPanelInit()
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -131,13 +144,13 @@ void CocosGUIExamplesScene::ExamplesButtonPanelInit()
     UIPanel* button_panel = dynamic_cast<UIPanel*>(example_root->getChildByName("button_panel")); 
     
     UIButton* equip_btn = dynamic_cast<UIButton*>(button_panel->getChildByName("equip_button"));
-    equip_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::ExamplesShowEquip));
+    equip_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::ExamplesShowEquip));
     
     UIButton* weapon_btn = dynamic_cast<UIButton*>(button_panel->getChildByName("weapon_button"));
-    weapon_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::ExamplesShowWeapon));
+    weapon_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::ExamplesShowWeapon));
 }
 
-void CocosGUIExamplesScene::ExamplesShowEquip(CCObject* pSender)
+void CocosGUIExampleLayer::ExamplesShowEquip(CCObject* pSender)
 {    
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -151,7 +164,7 @@ void CocosGUIExamplesScene::ExamplesShowEquip(CCObject* pSender)
     button_panel->disable(true);
 }
 
-void CocosGUIExamplesScene::ExamplesShowWeapon(CCObject* pSender)
+void CocosGUIExampleLayer::ExamplesShowWeapon(CCObject* pSender)
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -189,7 +202,7 @@ void CocosGUIExamplesScene::ExamplesShowWeapon(CCObject* pSender)
 }
 
 // equip
-void CocosGUIExamplesScene::EquipInit()
+void CocosGUIExampleLayer::EquipInit()
 {
     m_eEquipType = EQUIP_TYPE_CLOTHES;
     
@@ -233,7 +246,7 @@ void CocosGUIExamplesScene::EquipInit()
     // title panel
     UIPanel* title_panel = dynamic_cast<UIPanel*>(equipe_root->getChildByName("Title"));
     UIButton* close_btn = dynamic_cast<UIButton*>(title_panel->getChildByName("button"));
-    close_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipClose));
+    close_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipClose));
     
     // up panel
     UIPanel* up_panel = dynamic_cast<UIPanel*>(equipe_root->getChildByName("UP"));
@@ -241,16 +254,16 @@ void CocosGUIExamplesScene::EquipInit()
     
     // switch button
     UITextButton* clothes_btn = dynamic_cast<UITextButton*>(up_panel->getChildByName("I_Button"));
-    clothes_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipSwitchBtnCallBack));
+    clothes_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipSwitchBtnCallBack));
     clothes_btn->setWidgetTag(EQUIP_SWITCH_PANEL_BUTTON_TAG_CLOTHES);
     clothes_btn->disable();
     
     UITextButton* weapons_btn = dynamic_cast<UITextButton*>(up_panel->getChildByName("II_Button"));
-    weapons_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipSwitchBtnCallBack));
+    weapons_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipSwitchBtnCallBack));
     weapons_btn->setWidgetTag(EQUIP_SWITCH_PANEL_BUTTON_TAG_WEAPONS);
     
     UITextButton* pets_btn = dynamic_cast<UITextButton*>(up_panel->getChildByName("III_Button"));
-    pets_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipSwitchBtnCallBack));
+    pets_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipSwitchBtnCallBack));
     pets_btn->setWidgetTag(EQUIP_SWITCH_PANEL_BUTTON_TAG_PETS);
     
     // repertories 
@@ -330,14 +343,14 @@ void CocosGUIExamplesScene::EquipInit()
     pets_panel->setTouchEnable(false, false);
 }
 
-void CocosGUIExamplesScene::EquipCreate()
+void CocosGUIExampleLayer::EquipCreate()
 {
     EquipCreateClothes();
     EquipCreateWeapons();
     EquipCreatePets();
 }
 
-void CocosGUIExamplesScene::EquipCreateClothes()
+void CocosGUIExampleLayer::EquipCreateClothes()
 {
     UIPanel* clothes_panel = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EQUIP_PANEL_TAG_CLOTHES));
     
@@ -375,9 +388,9 @@ void CocosGUIExamplesScene::EquipCreateClothes()
         }
         jacket_iv->setName(jacket_name[i]);
         jacket_iv->setTouchEnable(true);
-        jacket_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        jacket_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        jacket_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        jacket_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        jacket_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        jacket_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(clothes_panel->getChildren(), obj)
@@ -421,9 +434,9 @@ void CocosGUIExamplesScene::EquipCreateClothes()
         }
         kimono_iv->setName(kimono_name[i]);
         kimono_iv->setTouchEnable(true);
-        kimono_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        kimono_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        kimono_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        kimono_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        kimono_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        kimono_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(clothes_panel->getChildren(), obj)
@@ -443,7 +456,7 @@ void CocosGUIExamplesScene::EquipCreateClothes()
     }
 }
 
-void CocosGUIExamplesScene::EquipCreateWeapons()
+void CocosGUIExampleLayer::EquipCreateWeapons()
 {
     UIPanel* weapons_panel = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EQUIP_PANEL_TAG_WEAPONS));
     
@@ -478,9 +491,9 @@ void CocosGUIExamplesScene::EquipCreateWeapons()
             sword_iv->setWidgetZOrder(lastChild->getWidgetZOrder() + 1);
         }
         sword_iv->setName(sword_name[i]);
-        sword_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        sword_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        sword_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        sword_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        sword_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        sword_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(weapons_panel->getChildren(), obj)
@@ -524,9 +537,9 @@ void CocosGUIExamplesScene::EquipCreateWeapons()
             arrow_iv->setWidgetZOrder(lastChild->getWidgetZOrder() + 1);
         }
         arrow_iv->setName(arrow_name[i]);
-        arrow_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        arrow_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        arrow_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        arrow_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        arrow_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        arrow_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(weapons_panel->getChildren(), obj)
@@ -566,9 +579,9 @@ void CocosGUIExamplesScene::EquipCreateWeapons()
             bomb_iv->setWidgetZOrder(lastChild->getWidgetZOrder() + 1);
         }
         bomb_iv->setName(bomb_name[i]);
-        bomb_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        bomb_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        bomb_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        bomb_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        bomb_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        bomb_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(weapons_panel->getChildren(), obj)
@@ -588,7 +601,7 @@ void CocosGUIExamplesScene::EquipCreateWeapons()
     }
 }
 
-void CocosGUIExamplesScene::EquipCreatePets()
+void CocosGUIExampleLayer::EquipCreatePets()
 {
     UIPanel* pets_panel = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EQUIP_PANEL_TAG_PETS));
     
@@ -619,9 +632,9 @@ void CocosGUIExamplesScene::EquipCreatePets()
             dragon_iv->setWidgetZOrder(lastChild->getWidgetZOrder() + 1);
         }
         dragon_iv->setName(dragon_name[i]);
-        dragon_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        dragon_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        dragon_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        dragon_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        dragon_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        dragon_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(pets_panel->getChildren(), obj)
@@ -661,9 +674,9 @@ void CocosGUIExamplesScene::EquipCreatePets()
             crab_iv->setWidgetZOrder(lastChild->getWidgetZOrder() + 1);
         }
         crab_iv->setName(crab_name[i]);
-        crab_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExamplesScene::EquipTouch));
-        crab_iv->addMoveEvent(this, coco_moveselector(CocosGUIExamplesScene::EquipMove));
-        crab_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::EquipDrop));
+        crab_iv->addPushDownEvent(this, coco_pushselector(CocosGUIExampleLayer::EquipTouch));
+        crab_iv->addMoveEvent(this, coco_moveselector(CocosGUIExampleLayer::EquipMove));
+        crab_iv->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::EquipDrop));
         
         CCObject* obj = NULL;
         CCARRAY_FOREACH(pets_panel->getChildren(), obj)
@@ -684,7 +697,7 @@ void CocosGUIExamplesScene::EquipCreatePets()
     
 }
 
-void CocosGUIExamplesScene::EquipSwitchBtnCallBack(CCObject *pSender)
+void CocosGUIExampleLayer::EquipSwitchBtnCallBack(CCObject *pSender)
 {
     // switch button
     UIButton* button = dynamic_cast<UIButton*>(pSender);
@@ -835,7 +848,7 @@ void CocosGUIExamplesScene::EquipSwitchBtnCallBack(CCObject *pSender)
     }
 }
 
-void CocosGUIExamplesScene::EquipTouch(CCObject *pSender)
+void CocosGUIExampleLayer::EquipTouch(CCObject *pSender)
 {
     UIWidget* widget = dynamic_cast<UIWidget*>(pSender);
     CCPoint worldSpace = widget->getContainerNode()->convertToWorldSpace(CCPointZero);
@@ -852,7 +865,7 @@ void CocosGUIExamplesScene::EquipTouch(CCObject *pSender)
     movePoint = widget->getTouchStartPos();
 }
 
-void CocosGUIExamplesScene::EquipMove(CCObject* pSender)
+void CocosGUIExampleLayer::EquipMove(CCObject* pSender)
 {
     UIWidget* widget = dynamic_cast<UIWidget*>(pSender);
     
@@ -863,7 +876,7 @@ void CocosGUIExamplesScene::EquipMove(CCObject* pSender)
     widget->setPosition(toPoint);
 }
 
-void CocosGUIExamplesScene::EquipDrop(CCObject *pSender)
+void CocosGUIExampleLayer::EquipDrop(CCObject *pSender)
 {
     bool isInUsedSlot = false;
     bool isInEquipSlot = false;
@@ -947,7 +960,7 @@ void CocosGUIExamplesScene::EquipDrop(CCObject *pSender)
         CCPoint point = widgetLastWorldSpace;
         CCMoveTo* moveTo = CCMoveTo::create(1.0f, point);
         CCEaseExponentialOut* ease = CCEaseExponentialOut::create(moveTo);
-        CCCallFuncO* calllFunc0 = CCCallFuncO::create(this, callfuncO_selector(CocosGUIExamplesScene::EquipBackOver), widget);
+        CCCallFuncO* calllFunc0 = CCCallFuncO::create(this, callfuncO_selector(CocosGUIExampleLayer::EquipBackOver), widget);
         CCSequence* seq = CCSequence::create(ease, calllFunc0, NULL);
         widget->runAction(seq);
         
@@ -966,7 +979,7 @@ void CocosGUIExamplesScene::EquipDrop(CCObject *pSender)
     }
 }
 
-void CocosGUIExamplesScene::EquipBackOver(CCObject *pObject)
+void CocosGUIExampleLayer::EquipBackOver(CCObject *pObject)
 {
     UIWidget* widget = dynamic_cast<UIWidget*>(pObject);
     
@@ -1008,7 +1021,7 @@ void CocosGUIExamplesScene::EquipBackOver(CCObject *pObject)
     up_panel->setTouchEnable(true, true);
 }
 
-void CocosGUIExamplesScene::EquipClose(CCObject* pObject)
+void CocosGUIExampleLayer::EquipClose(CCObject* pObject)
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -1023,7 +1036,7 @@ void CocosGUIExamplesScene::EquipClose(CCObject* pObject)
 }
 
 // weapon
-void CocosGUIExamplesScene::WeaponInit()
+void CocosGUIExampleLayer::WeaponInit()
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -1035,7 +1048,7 @@ void CocosGUIExamplesScene::WeaponInit()
     // title panel
     UIPanel* title_panel = dynamic_cast<UIPanel*>(weapon_root->getChildByName("Title"));
     UIButton* close_btn = dynamic_cast<UIButton*>(title_panel->getChildByName("Button"));
-    close_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::WeaponClose));
+    close_btn->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::WeaponClose));
     
     // introduce panel
     UIPanel* introduce_panel = dynamic_cast<UIPanel*>(weapon_root->getChildByName("introduce_panel"));
@@ -1046,7 +1059,7 @@ void CocosGUIExamplesScene::WeaponInit()
     WeaponCreate();
 }
 
-void CocosGUIExamplesScene::WeaponCreate()
+void CocosGUIExampleLayer::WeaponCreate()
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -1110,13 +1123,13 @@ void CocosGUIExamplesScene::WeaponCreate()
             
             // weapon item normal
             UIImageView* normal = dynamic_cast<UIImageView*>(item->getChildByName("normal"));
-            normal->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::WeaponItemTouch));
+            normal->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::WeaponItemTouch));
             // weapon item selected
             UIImageView* selected = dynamic_cast<UIImageView*>(item->getChildByName("selected"));
             selected->setVisible(false);
             // weapon item weapon
             UIImageView* weapon = dynamic_cast<UIImageView*>(item->getChildByName("weapon"));
-            weapon->addReleaseEvent(this, coco_releaseselector(CocosGUIExamplesScene::WeaponItemTouch));
+            weapon->addReleaseEvent(this, coco_releaseselector(CocosGUIExampleLayer::WeaponItemTouch));
         }
         
         if (isBreak_i)
@@ -1126,7 +1139,7 @@ void CocosGUIExamplesScene::WeaponCreate()
     }        
 }
 
-void CocosGUIExamplesScene::WeaponItemTouch(CCObject* pObject)
+void CocosGUIExampleLayer::WeaponItemTouch(CCObject* pObject)
 {
     // weapon item child
     UIImageView* widget = dynamic_cast<UIImageView*>(pObject);
@@ -1159,7 +1172,7 @@ void CocosGUIExamplesScene::WeaponItemTouch(CCObject* pObject)
     WeaponItemShowDetail(item);
 }
 
-void CocosGUIExamplesScene::WeaponItemShowDetail(UIWidget* widget)
+void CocosGUIExampleLayer::WeaponItemShowDetail(UIWidget* widget)
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));
@@ -1173,7 +1186,7 @@ void CocosGUIExamplesScene::WeaponItemShowDetail(UIWidget* widget)
     introduce_text->setText(weapon_introduce_text[widget->getWidgetTag() - WEAPON_ITEM_PANEL_TAG]);
 }
 
-void CocosGUIExamplesScene::WeaponClose(CCObject* pObject)
+void CocosGUIExampleLayer::WeaponClose(CCObject* pObject)
 {
     // examples root
     UIWidget* example_root = dynamic_cast<UIPanel*>(ul->getWidgetByTag(EXAMPLE_PANEL_TAG_ROOT));

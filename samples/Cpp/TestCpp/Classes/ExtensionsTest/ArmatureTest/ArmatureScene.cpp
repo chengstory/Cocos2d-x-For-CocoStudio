@@ -161,6 +161,7 @@ void ArmatureTestLayer::onEnter()
 }
 void ArmatureTestLayer::onExit()
 {
+	removeAllChildren();
 }
 
 std::string ArmatureTestLayer::title()
@@ -644,9 +645,11 @@ bool TestArmatureNesting::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
 	++weaponIndex;
 	weaponIndex = weaponIndex % 4;
-
-	armature->getBone("armInside")->getChildArmature()->getAnimation()->playByIndex(weaponIndex);
-	armature->getBone("armOutside")->getChildArmature()->getAnimation()->playByIndex(weaponIndex);
+	if(armature != NULL)
+	{
+		armature->getBone("armInside")->getChildArmature()->getAnimation()->playByIndex(weaponIndex);
+		armature->getBone("armOutside")->getChildArmature()->getAnimation()->playByIndex(weaponIndex);
+	}
 	return false;
 }
 void TestArmatureNesting::registerWithTouchDispatcher()

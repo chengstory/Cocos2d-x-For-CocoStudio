@@ -452,6 +452,10 @@ void TestParticleDisplay::onEnter()
 	bone->setScale(1.2f);
 	armature->addBone(bone, "bady-a30");
 }
+void TestParticleDisplay::onExit()
+{
+	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
+}
 std::string TestParticleDisplay::title()
 {
 	return "Test Particle Display";
@@ -497,6 +501,10 @@ void TestUseMutiplePicture::onEnter()
 		displayData.setParam(weapon[i].c_str());
 		armature->getBone("weapon")->addDisplay(&displayData, i);
 	}
+}
+void TestUseMutiplePicture::onExit()
+{
+	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 }
 std::string TestUseMutiplePicture::title()
 {
@@ -636,6 +644,10 @@ void TestArmatureNesting::onEnter()
 	addChild(armature);
 
 	weaponIndex = 0;
+}
+void TestArmatureNesting::onExit()
+{
+	CCDirector::sharedDirector()->getTouchDispatcher()->removeDelegate(this);
 }
 std::string TestArmatureNesting::title()
 {
